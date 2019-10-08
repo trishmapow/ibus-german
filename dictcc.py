@@ -8,8 +8,9 @@ from recordclass import make_dataclass
 Word = make_dataclass(
     "Word", ("de", "en", "gender", "w_type", "categories", "en_tags", "de_tags")
 )
-Word.__str__ = (
-    lambda self: f"({' '.join(self.gender)}) {self.de} [{' '.join(self.de_tags)}] => ({' '.join(self.w_type)}) {self.en}, [{' '.join(self.en_tags)}]"
+Word.__str__ = lambda self: (
+    f"({' '.join(self.gender)}) {self.de} [{' '.join(self.de_tags)}] => "
+    f"({' '.join(self.w_type)}) {self.en} [{' '.join(self.en_tags)}]"
 )
 
 
@@ -20,15 +21,16 @@ class DictParser:
 
         try:
             self.num_words = int(linecache.getline(self.path_to_parsed, 1))
-        except ValueError:  # file doesn't exist
+        except ValueError:                          # file doesn't exist
             words = self.parse_txt(debug=True)
-            words.sort(key=lambda w: w.de.lower())
+            words.sort(key=lambda w: w.de.lower())  # sort lower before uppercase
             self.num_words = len(words)
             with open(self.path_to_parsed, "w") as f:
-                f.write(f"{self.num_words}\n")
-                for word in words:
+                f.write(f"{self.num_words}\n")      # save file length for efficiency
+                for word in words:                  # save eval-able list
                     f.write(
-                        f'["{word.de}", "{word.en}", {word.gender}, {word.w_type}, {word.categories}, {word.en_tags}, {word.de_tags}]\n'
+                        f'["{word.de}", "{word.en}", {word.gender}, {word.w_type}, '
+                        f"{word.categories}, {word.en_tags}, {word.de_tags}]\n"
                     )
             del words
 
@@ -44,7 +46,16 @@ class DictParser:
     def parse_txt(self, debug=False):
         words = list()
         regex = re.compile(
-            r"^(?P<de_extra>\(.*?\)\s)?(?P<de>[^\{\[;]+)\s?(?P<gender>(?:\{(?:m|f|n|pl)\}\s?)*)(?P<de_tags>(?:\[.+?\]\s?)*)(?P<de_2>.*?);(?P<en>[^\[]+?)(?P<en_tags>(?:\[.+?\]\s?)*);(?P<type>(?:[^;\[\n])*);?(?P<tags>(?:\[.+?\]\s)*)"
+            r"""^(?P<de_extra>\(.*?\)\s)?               # bracketed extra info
+                 (?P<de>[^\{\[;]+)\s?                   # DE word
+                 (?P<gender>(?:\{(?:m|f|n|pl)\}\s?)*)   # m/f/n/pl gender(s)
+                 (?P<de_tags>(?:\[.+?\]\s?)*)           # DE tag info in []
+                 (?P<de_2>.*?);(?P<en>[^\[]+?)          # sometimes DE word split, combine with <de>
+                 (?P<en_tags>(?:\[.+?\]\s?)*);          # EN tag info in []
+                 (?P<type>(?:[^;\[\n])*);?              # word type(s)
+                 (?P<tags>(?:\[.+?\]\s)*)               # word categor(y|ies)
+            """,
+            re.VERBOSE,
         )
 
         with open(self.path_to_txt, encoding="utf-8") as dictdata:
@@ -94,7 +105,6 @@ class DictParser:
         while lo < hi:
             mid = (lo + hi) // 2
             word = self.get_word(mid)
-            print(mid, word.de)
             if word.de.lower() < x.lower():
                 lo = mid + 1
             else:
