@@ -9,15 +9,10 @@ This simple input method for [ibus](https://github.com/ibus/ibus) allows you to 
 
 Dependencies
 -------------
-
-Obviously:
-
 - ibus
-- python
-
-Less obviously:
-
-- the ibus gobject introspection information (on debian/ubuntu: gir1.2-ibus-1.0)
+- python3
+- python `recordclass` module e.g. `pip3 install recordclass`
+- ibus gobject introspection information e.g. `sudo apt install gir1.2-ibus-1.0`
 
 Installing
 -----------
