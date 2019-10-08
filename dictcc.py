@@ -1,27 +1,10 @@
-from dataclasses import dataclass, field
-from typing import List
 from bisect import bisect_left
 import re
-import pickle
-from functools import total_ordering
+import linecache
 
-@dataclass
-@total_ordering
-class Word:
-    
-    de: str
-    en: str = ''
-    gender: List[str] = field(default_factory=list)
-    w_type: List[str] = field(default_factory=list)
-    categories: List[str] = field(default_factory=list)
-    en_tags: List[str] = field(default_factory=list)
-    de_tags: List[str] = field(default_factory=list)
+from recordclass import make_dataclass
 
-    def __lt__(self, other):
-        return self.de.lower() < other.de.lower()
-
-    def __str__(self):
-        return f"'{self.de}' (DE) => '{self.en}' (EN)"
+Word = make_dataclass('Word', ('de', 'en', 'gender', 'w_type', 'categories', 'en_tags', 'de_tags'))
 
 class DictParser:
 
@@ -31,18 +14,16 @@ class DictParser:
         self.words = list()
 
         try:
-            with open(path_to_pickle, 'rb') as f:
-                self.words = pickle.load(f)
+            with open(self.path_to_pickle, 'r') as f:
+                for line in f.readlines():
+                    self.words.append(eval(line))
         except FileNotFoundError:
             self.words = self.parse_txt(debug=True)
-            with open(path_to_pickle, 'wb') as f:
-                pickle.dump(self.words, f)
+            with open(self.path_to_pickle, 'w') as f:
+                for word in self.words:
+                    f.write(f"{repr(word)}\n")
         else:
             print("Successfuly loaded pickled words")
-
-    @staticmethod
-    def tags_to_list(s, brackets):
-        return s.replace(brackets[0], '').replace(brackets[1], '').split()
 
     def parse_txt(self, debug=False):
         words = list()
@@ -71,11 +52,22 @@ class DictParser:
 
         return words
 
+    @staticmethod
+    def tags_to_list(s, brackets):
+        return s.replace(brackets[0], '').replace(brackets[1], '').split()
+
     def words_starting_with(self, s, num=10):
         l_index = bisect_left(self.words, s)
         return [self.words[i] for i in range(l_index, l_index + num) if self.words[i].de.lower().startswith(s.de)]
 
 if __name__ == "__main__":
+    #from pympler import asizeof
+    #import objgraph
+    #objgraph.show_growth(limit=3)
+    #import gc
     d = DictParser()
-    while True:
-        print(d.words_starting_with(Word(input())))
+    #gc.collect()
+    print(d.words[500000])
+    #objgraph.show_growth()
+    #while True:
+    #    print(d.words_starting_with(Word(input(), None, None, None, None, None, None)))
