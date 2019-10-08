@@ -1,11 +1,11 @@
-UniEmoji for ibus
+AutoGerman for IBus
 ==================
 
-This simple input method for [ibus](https://github.com/ibus/ibus) allows you to enter unicode emoji and other symbols by name.
+(forked from the lovely [ibus-uniemoji](https://github.com/salty-horse/ibus-uniemoji) project)
+
+This simple input method for [ibus](https://github.com/ibus/ibus) allows you to autocomplete German words and view definitions provided by dict.cc. Word type, gender and both English and German tags are displayed when available.
 
 ![Example usage](/example.gif?raw=true)
-
-Since this is such a small project, there's no mailing list or website or anything. If you want automatic notification of new releases, you can use the Github releases feature; it even has a [feed](https://github.com/salty-horse/ibus-uniemoji/releases.atom).
 
 Dependencies
 -------------
@@ -26,62 +26,37 @@ Optional:
 Installing
 -----------
 
-To install, type `make install`. If your ibus isn't on /usr/share/ibus, or you want to install to /usr/local, you can pass any of `PREFIX`, `DATADIR`, and `SYSCONFDIR` to `make`. You can also pass `DESTDIR` to aid in packaging, or `PYTHON` to use a different Python executable.
+Unfortunately I cannot distribute the dict.cc dictionary with this package, and due to format quirks there are a few steps to make the txt file usable:
+
+1. Download the raw file from https://www1.dict.cc/translation_file_request.php?l=e
+2. Move the file to the `ibus-german` folder and rename to `dictcc.txt`
+3. Run `python3 dictcc.py` once which will parse the file and output to `parsed_dictcc.txt`. This may take ~30s. 
+4. Run `sudo make install`
+
+Old instructions: to install, type `make install`. If your ibus isn't on /usr/share/ibus, or you want to install to /usr/local, you can pass any of `PREFIX`, `DATADIR`, and `SYSCONFDIR` to `make`. You can also pass `DESTDIR` to aid in packaging, or `PYTHON` to use a different Python executable.
 
 Running
 --------
 
 Restart (or start) your ibus. This can be done with the command `ibus restart`.
 
-If you have customized your active input methods, you'll need to enable UniEmoji: open preferences (use the indicator if you have it, otherwise open “Keyboard Input Methods” on Ubuntu's dash, or run “ibus-setup”), go to the “Input Method” tab, click the “Select an input method” drop-down, UniEmoji will be in the “Other” category.
+If you have customized your active input methods, you'll need to enable AutoGerman: open preferences (use the indicator if you have it, otherwise open “Keyboard Input Methods” on Ubuntu's dash, or run “ibus-setup”), go to the “Input Method” tab, click the “Select an input method” drop-down, AutoGerman will be in the “Other” category.
 
-Then activate ibus using whatever key combination you have configured, and change input method until you have UniEmoji on (or use the drop-down you get by clicking the input method name on the input method toolbar).
+Then activate ibus using whatever key combination you have configured, and change input method until you have AutoGerman on (or use the drop-down you get by clicking the input method name on the input method toolbar).
 
 Type some text you believe to be part of the name of an emoji or symbol. Select the one you want the usual ways (type more, use the cursor, numbers, mouse, touch...), and press Enter to insert.
 
 Then you probably want to turn it off so you can type normal text.
 
-Defining custom symbols
-------------------------
-
-UniEmoji automatically loads custom symbols from the following files:
-
-* `/etc/xdg/uniemoji/custom.json` (overridden by `make install`!)
-* `~/.config/uniemoji/custom.json`
-
-The file format is a simple JSON object. See [custom.json](custom.json) for an example.
-
-How the search is done and results are formatted
--------------------------------------------------
-
-UniEmoji uses several data sources, and allows you to search all of them in a mostly-intelligent manner, with results given priority based on their source.
-
-The search is fuzzy, so searching for 'tco' will find 'taco'. However, it will not correct typos that include extra letters.
-
-The list of candidates that appears in the drop-down includes several bits of information:
-
-* If the character has an "emoji shortname" (provided by EmojiOne), the shortname will appear first in the result, surrounded by colons.
-A shortname is also a good indication that the candidate has an graphical representation, which will be replaced by an actual image on some clients (such as Twitter.com).
-* If your search query matches an alias, the alias will be shown in square brackets.
-
-For example, here is a result that appears when you search for 'eggplant' or 'aubergine':
->🍆: :​eggplant: aubergine
-
-Here is a result that appears when you search for 'dog', which is one of the aliases for 'paw prints':
->🐾: :​feet: paw prints [dog]
-
 Credits
 --------
 
+* AutoGerman fork: Christopher Malau
 * Original author: Lalo Martins
-* Current maintainer: Ori Avtalion
+* Original maintainer: Ori Avtalion
 
-UniEmoji is dedicated to @MsAmberPRiley who AFAIK isn't even a GNU/Linux user and therefore might never hear of it, but who caused me to detour a Sunday to writing it ;-)
 
 License
 --------
 
-UniEmoji is licensed under the GNU General Public License v3.0, except for the following files:
-
-* UnicodeData.txt is provided by the [Unicode Consortium](http://unicode.org/) under a specific license. See COPYING.unicode for details.
-* emojione.json is provided by [EmojiOne](http://emojione.com/) under the MIT license.
+AutoGerman is licensed under the GNU General Public License v3.0.

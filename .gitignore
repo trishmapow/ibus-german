@@ -1,5 +1,7 @@
-uniemoji.db
-uniemoji.xml
+autogerman.xml
 config.py
 *~
-*.pyc
+.vscode/
+.__pycache__/
+dictcc.txt
+parsed_dictcc.txt

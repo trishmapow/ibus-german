@@ -8,9 +8,9 @@ DESTDIR ?=
 
 PYTHON ?= /usr/bin/python3
 
-all: uniemoji.xml config.py
+all: autogerman.xml config.py
 
-uniemoji.xml: uniemoji.xml.in
+autogerman.xml: autogerman.xml.in
 	sed -e "s:@PYTHON@:$(PYTHON):g;" \
 	    -e "s:@DATADIR@:$(DATADIR):g" $< > $@
 
@@ -18,26 +18,24 @@ config.py: config.py.in
 	sed -e "s:@SYSCONFDIR@:$(SYSCONFDIR):g" $< > $@
 
 install: all
-	install -m 0755 -d $(DESTDIR)$(DATADIR)/ibus-uniemoji $(DESTDIR)$(SYSCONFDIR)/xdg/uniemoji $(DESTDIR)$(DATADIR)/ibus/component
-	install -m 0644 uniemoji.svg UnicodeData.txt emojione.json $(DESTDIR)$(DATADIR)/ibus-uniemoji
-	install -m 0755 uniemoji.py $(DESTDIR)$(DATADIR)/ibus-uniemoji
-	install -m 0644 config.py $(DESTDIR)$(DATADIR)/ibus-uniemoji
-	install -m 0644 ibus.py $(DESTDIR)$(DATADIR)/ibus-uniemoji
-	install -m 0644 uniemoji.xml $(DESTDIR)$(DATADIR)/ibus/component
-	install -m 0644 custom.json $(DESTDIR)$(SYSCONFDIR)/xdg/uniemoji
+	install -m 0755 -d $(DESTDIR)$(DATADIR)/ibus-german $(DESTDIR)$(SYSCONFDIR)/xdg/ibus-german $(DESTDIR)$(DATADIR)/ibus/component
+	install -m 0644 icon.png $(DESTDIR)$(DATADIR)/ibus-german
+	install -m 0755 dictcc.py $(DESTDIR)$(DATADIR)/ibus-german
+	install -m 0644 parsed_dictcc.txt $(DESTDIR)$(DATADIR)/ibus-german
+	install -m 0644 config.py $(DESTDIR)$(DATADIR)/ibus-german
+	install -m 0644 ibus.py $(DESTDIR)$(DATADIR)/ibus-german
+	install -m 0644 autogerman.xml $(DESTDIR)$(DATADIR)/ibus/component
 
 uninstall:
-	rm -f $(DESTDIR)$(DATADIR)/ibus-uniemoji/uniemoji.svg
-	rm -f $(DESTDIR)$(DATADIR)/ibus-uniemoji/UnicodeData.txt
-	rm -f $(DESTDIR)$(DATADIR)/ibus-uniemoji/emojione.json
-	rm -f $(DESTDIR)$(DATADIR)/ibus-uniemoji/uniemoji.py
-	rm -f $(DESTDIR)$(DATADIR)/ibus-uniemoji/config.py
-	rm -f $(DESTDIR)$(DATADIR)/ibus-uniemoji/ibus.py
-	rmdir $(DESTDIR)$(DATADIR)/ibus-uniemoji
-	rm -f $(DESTDIR)$(SYSCONFDIR)/xdg/uniemoji/custom.json
-	rmdir $(DESTDIR)$(SYSCONFDIR)/xdg/uniemoji
-	rm -f $(DESTDIR)$(DATADIR)/ibus/component/uniemoji.xml
+	rm -f $(DESTDIR)$(DATADIR)/ibus-german/icon.png
+	rm -f $(DESTDIR)$(DATADIR)/ibus-german/dictcc.py
+	rm -f $(DESTDIR)$(DATADIR)/ibus-german/parsed_dictcc.txt
+	rm -f $(DESTDIR)$(DATADIR)/ibus-german/config.py
+	rm -f $(DESTDIR)$(DATADIR)/ibus-german/ibus.py
+	rmdir $(DESTDIR)$(DATADIR)/ibus-german
+	rmdir $(DESTDIR)$(SYSCONFDIR)/xdg/ibus-german
+	rm -f $(DESTDIR)$(DATADIR)/ibus/component/autogerman.xml
 
 clean:
-	rm -f uniemoji.xml
+	rm -f autogerman.xml
 	rm -f config.py

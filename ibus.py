@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # UniEmoji: ibus engine for unicode emoji and symbols by name
+# Modified 2019 Christopher Malau for ibus-german
 #
 # Copyright (c) 2013, 2015 Lalo Martins <lalo.martins@gmail.com>
 #
@@ -31,7 +32,7 @@ import sys
 import getopt
 import locale
 
-from uniemoji import UniEmoji
+from dictcc import DictParser, Word
 
 __base_dir__ = os.path.dirname(__file__)
 
@@ -55,18 +56,18 @@ del n
 
 ###########################################################################
 # the engine
-class UniEmojiIBusEngine(IBus.Engine):
-    __gtype_name__ = 'UniEmojiIBusEngine'
+class AutoGermanIBusEngine(IBus.Engine):
+    __gtype_name__ = 'AutoGermanIBusEngine'
 
     def __init__(self):
-        super(UniEmojiIBusEngine, self).__init__()
-        self.uniemoji = UniEmoji()
+        super(AutoGermanIBusEngine, self).__init__()
+        self.dictcc = DictParser()
         self.is_invalidate = False
         self.preedit_string = ''
-        self.lookup_table = IBus.LookupTable.new(10, 0, True, True)
+        self.lookup_table = IBus.LookupTable.new(10, 0, True, True) # changed page size to 16 (max)
         self.prop_list = IBus.PropList()
 
-        debug("Create UniEmoji engine OK")
+        debug("Create DictCC engine OK")
 
     def set_lookup_table_cursor_pos_in_current_page(self, index):
         '''Sets the cursor in the lookup table to index in the current page
@@ -143,7 +144,8 @@ class UniEmojiIBusEngine(IBus.Engine):
 
         # Allow typing all ASCII letters and punctuation, except digits
         if ord(' ') <= keyval < ord('0') or \
-           ord('9') < keyval <= ord('~'):
+           ord('9') < keyval <= ord('~') or \
+           keyval in [228, 246, 252, 223, 196, 214, 220, 7838]: # Allow ae oe ue ss and respective capitals
             if state & (IBus.ModifierType.CONTROL_MASK | IBus.ModifierType.MOD1_MASK) == 0:
                 self.preedit_string += chr(keyval)
                 self.invalidate()
@@ -200,8 +202,8 @@ class UniEmojiIBusEngine(IBus.Engine):
         self.candidates = []
 
         if preedit_len > 0:
-            uniemoji_results = self.uniemoji.find_characters(self.preedit_string)
-            for char_sequence, display_str in uniemoji_results:
+            dictcc_results = self.dictcc.words_starting_with(self.preedit_string)
+            for char_sequence, display_str in dictcc_results:
                 candidate = IBus.Text.new_from_string(display_str)
                 self.candidates.append(char_sequence)
                 self.lookup_table.append_candidate(candidate)
@@ -260,16 +262,16 @@ class IMApp:
         self.bus = IBus.Bus()
         self.bus.connect("disconnected", self.bus_disconnected_cb)
         self.factory = IBus.Factory.new(self.bus.get_connection())
-        self.factory.add_engine("uniemoji", GObject.type_from_name("UniEmojiIBusEngine"))
+        self.factory.add_engine("autogerman", GObject.type_from_name("AutoGermanIBusEngine"))
         if exec_by_ibus:
-            self.bus.request_name("org.freedesktop.IBus.UniEmoji", 0)
+            self.bus.request_name("org.freedesktop.IBus.IBusAutoGerman", 0)
         else:
-            xml_path = os.path.join(__base_dir__, 'uniemoji.xml')
+            xml_path = os.path.join(__base_dir__, 'autogerman.xml')
             if os.path.exists(xml_path):
                 component = IBus.Component.new_from_file(xml_path)
             else:
                 xml_path = os.path.join(os.path.dirname(__base_dir__),
-                                        'ibus', 'component', 'uniemoji.xml')
+                                        'ibus', 'component', 'autogerman.xml')
                 component = IBus.Component.new_from_file(xml_path)
             self.bus.register_component(component)
 

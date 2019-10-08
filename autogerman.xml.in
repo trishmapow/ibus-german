@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- filename: autogerman.xml -->
+<component>
+    <name>org.freedesktop.IBus.IBusAutoGerman</name>
+    <description>German autocomplete powered by dict.cc</description>
+    <version>0.1.0</version>
+    <license>GPL</license>
+    <author>Christopher Malau &lt;github/trishmapow&gt;</author>
+    <homepage>https://github.com/trishmapow/ibus-german</homepage>
+    <exec>@PYTHON@ @DATADIR@/ibus-german/ibus.py --ibus</exec>
+    <textdomain>uniemoji</textdomain>
+    <engines>
+        <engine>
+            <name>autogerman</name>
+            <longname>autogerman</longname>
+            <description>German autocomplete powered by dict.cc</description>
+            <language></language>
+            <license>GPL</license>
+            <author>Christopher Malau &lt;github/trishmapow&gt;</author>
+            <icon>@DATADIR@/ibus-german/icon.png</icon>
+            <layout>de</layout>
+            <layout_variant></layout_variant>
+            <layout_option></layout_option>
+            <hotkeys></hotkeys>
+            <symbol>🇩🇪</symbol>
+            <setup></setup>
+            <version></version>
+            <textdomain></textdomain>
+            <rank>0</rank>
+        </engine>
+    </engines>
+</component>
