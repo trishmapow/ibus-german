@@ -64,7 +64,7 @@ class DictParser:
                 line = re.sub(r"\t+", ";", html.unescape(line))
                 match = re.match(regex, line)
                 if match:
-                    m_dict = {k: v.strip() for k, v in match.groupdict(default="")}
+                    m_dict = {k: v.strip() for k, v in match.groupdict(default="").items()}
                     words.append(
                         Word(
                             m_dict["de"] + m_dict["de_2"],
