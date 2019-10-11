@@ -3,7 +3,7 @@ AutoGerman for IBus
 
 (forked from the lovely [ibus-uniemoji](https://github.com/salty-horse/ibus-uniemoji) project)
 
-This simple input method for [ibus](https://github.com/ibus/ibus) allows you to autocomplete German words and view definitions provided by dict.cc. Word type, gender and both English and German tags are displayed when available.
+This simple input method for [ibus](https://github.com/ibus/ibus) allows you to autocomplete German words and phrases (by typing in English or German) and view definitions provided by dict.cc. Word type, gender and both English and German tags are displayed when available.
 
 ![Example usage](/example.gif?raw=true)
 
@@ -21,7 +21,7 @@ Unfortunately I cannot distribute the dict.cc dictionary with this package, and 
 
 1. Download the raw file from https://www1.dict.cc/translation_file_request.php?l=e
 2. Move the file to the `ibus-german` folder and rename to `dictcc.txt`
-3. Run `python3 dictcc.py` once which will parse the file and output to `parsed_dictcc.txt`. This may take ~30s. 
+3. Run `python3 dictcc.py` once which will parse the file and output to `de_parsed_dictcc.txt` and `en_parsed_dictcc.txt`. This may take ~30s. These files are sorted in German/English for faster lookups. (Approximate size ~100MB each)
 4. Run `sudo make install`
 
 Old instructions: to install, type `make install`. If your ibus isn't on /usr/share/ibus, or you want to install to /usr/local, you can pass any of `PREFIX`, `DATADIR`, and `SYSCONFDIR` to `make`. You can also pass `DESTDIR` to aid in packaging, or `PYTHON` to use a different Python executable.

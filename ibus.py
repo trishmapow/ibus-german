@@ -202,7 +202,10 @@ class AutoGermanIBusEngine(IBus.Engine):
         self.candidates = []
 
         if preedit_len > 0:
-            dictcc_results = self.dictcc.words_starting_with(self.preedit_string)
+            if self.preedit_string[0] == '!':   # exclamation mark to switch languages
+                dictcc_results = self.dictcc.words_starting_with(self.preedit_string[1:], lang='EN')
+            else:
+                dictcc_results = self.dictcc.words_starting_with(self.preedit_string, lang='DE')
             for char_sequence, display_str in dictcc_results:
                 candidate = IBus.Text.new_from_string(display_str)
                 self.candidates.append(char_sequence)

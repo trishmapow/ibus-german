@@ -17,7 +17,8 @@ Word.__str__ = lambda self: (
 class DictParser:
     def __init__(self, path_to_txt="dictcc.txt", path_to_parsed="parsed_dictcc.txt"):
         self.path_to_txt = path_to_txt
-        self.path_to_parsed = path_to_parsed
+        self.path_to_parsed = "de_" + path_to_parsed
+        self.path_to_parsed_en = "en_" + path_to_parsed
 
         try:
             self.num_words = int(linecache.getline(self.path_to_parsed, 1))
@@ -25,19 +26,29 @@ class DictParser:
             words = self.parse_txt(debug=True)
             words.sort(key=lambda w: w.de.lower())  # sort lower before uppercase
             self.num_words = len(words)
-            with open(self.path_to_parsed, "w") as f:
-                f.write(f"{self.num_words}\n")      # save file length for efficiency
-                for word in words:                  # save eval-able list
-                    f.write(
-                        f'["{word.de}", "{word.en}", {word.gender}, {word.w_type}, '
-                        f"{word.categories}, {word.en_tags}, {word.de_tags}]\n"
-                    )
+
+            words_en = sorted(words, key=lambda w: w.en.lower())    # sort by english word
+
+            with open(self.path_to_parsed, "w") as f, open(self.path_to_parsed_en, "w") as f_en:
+                length = f"{self.num_words}\n"      # save file length for efficiency
+
+                # save eval-able list
+                format_output = lambda word: (f'["{word.de}", "{word.en}", {word.gender}, {word.w_type}, '
+                                f"{word.categories}, {word.en_tags}, {word.de_tags}]\n")
+                f.write(length)
+                for word in words:
+                    f.write(format_output(word))
+
+                f_en.write(length)
+                for word in words_en:
+                    f_en.write(format_output(word))
             del words
 
-    def get_word(self, index):
+    def get_word(self, index, lang='DE'):
         try:
+            path = self.path_to_parsed if lang == 'DE' else self.path_to_parsed_en
             return Word(
-                *literal_eval(linecache.getline(self.path_to_parsed, index + 2).strip())
+                *literal_eval(linecache.getline(path, index + 2).strip())
             )
         except (SyntaxError, TypeError) as e:
             print(e)
@@ -89,23 +100,29 @@ class DictParser:
     def tags_to_list(s, brackets):
         return s.replace(brackets[0], "").replace(brackets[1], "").split()
 
-    def words_starting_with(self, s, num=40):
-        l_index = self.search(s)
+    def words_starting_with(self, s, num=40, lang='DE'):
+        l_index = self.search(s, lang=lang)
         result = list()
         for i in range(l_index, l_index + num):
-            word = self.get_word(i)
-            result.append((word.de, str(word)))
+            word = self.get_word(i, lang=lang)
+            if lang == 'DE':
+                text = str(word)
+            else:
+                text = str(word).split(' => ')
+                text = text[1] + ' => ' + text[0]
+            result.append((word.de, text))
         return result
 
-    def search(self, x, lo=0, hi=None):
+    def search(self, target, lo=0, hi=None, lang='DE'):
         if lo < 0:
             raise ValueError("lo must be non-negative")
         if hi is None:
             hi = self.num_words
         while lo < hi:
             mid = (lo + hi) // 2
-            word = self.get_word(mid)
-            if word.de.lower() < x.lower():
+            word = self.get_word(mid, lang=lang)
+            compare = word.de if lang == 'DE' else word.en
+            if compare.lower() < target.lower():
                 lo = mid + 1
             else:
                 hi = mid
@@ -114,9 +131,10 @@ class DictParser:
 
 if __name__ == "__main__":
     d = DictParser()
+    language = input("Language (DE or EN): ")
     try:
         while True:
-            results = d.words_starting_with(input("Search: "))
+            results = d.words_starting_with(input("Search: "), lang=language)
             print(f"first: {results[0]} last: {results[-1]}")
     except KeyboardInterrupt:
         exit()

@@ -1,7 +1,5 @@
 autogerman.xml
 config.py
-*~
 .vscode/
-.__pycache__/
-dictcc.txt
-parsed_dictcc.txt
+__pycache__/
+*dictcc.txt
