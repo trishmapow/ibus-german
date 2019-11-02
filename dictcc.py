@@ -15,38 +15,42 @@ Word.__str__ = lambda self: (
 
 
 class DictParser:
-    def __init__(self, path_to_txt="dictcc.txt", path_to_parsed="parsed_dictcc.txt"):
-        self.path_to_txt = path_to_txt
-        self.path_to_parsed = "de_" + path_to_parsed
-        self.path_to_parsed_en = "en_" + path_to_parsed
+    def __init__(self, input_file="dictcc.txt", output_file="parsed_dictcc.txt"):
+        self.input_file = input_file
+        self.output_file = "de_" + output_file
+        self.output_file_en = "en_" + output_file
 
         try:
-            self.num_words = int(linecache.getline(self.path_to_parsed, 1))
+            self.num_words = int(linecache.getline(self.output_file, 1))
         except ValueError:                          # file doesn't exist
+            print(f"First run, parsing {self.input_file}... (may take a moment)")
             words = self.parse_txt(debug=True)
             words.sort(key=lambda w: w.de.lower())  # sort lower before uppercase
             self.num_words = len(words)
 
             words_en = sorted(words, key=lambda w: w.en.lower())    # sort by english word
 
-            with open(self.path_to_parsed, "w") as f, open(self.path_to_parsed_en, "w") as f_en:
+            with open(self.output_file, "w") as f, open(self.output_file_en, "w") as f_en:
                 length = f"{self.num_words}\n"      # save file length for efficiency
 
                 # save eval-able list
                 format_output = lambda word: (f'["{word.de}", "{word.en}", {word.gender}, {word.w_type}, '
                                 f"{word.categories}, {word.en_tags}, {word.de_tags}]\n")
+                print(f"Writing to {self.output_file}...")
                 f.write(length)
                 for word in words:
                     f.write(format_output(word))
 
+                print(f"Writing to {self.output_file_en}")
                 f_en.write(length)
                 for word in words_en:
                     f_en.write(format_output(word))
             del words
+            print("Parsing and saving complete.")
 
     def get_word(self, index, lang='DE'):
         try:
-            path = self.path_to_parsed if lang == 'DE' else self.path_to_parsed_en
+            path = self.output_file if lang == 'DE' else self.output_file_en
             return Word(
                 *literal_eval(linecache.getline(path, index + 2).strip())
             )
@@ -69,9 +73,9 @@ class DictParser:
             re.VERBOSE,
         )
 
-        with open(self.path_to_txt, encoding="utf-8") as dictdata:
+        with open(self.input_file, encoding="utf-8") as dictdata:
             count = failed = 0
-            for line in dictdata.readlines():
+            for line in dictdata:
                 line = re.sub(r"\t+", ";", html.unescape(line))
                 match = re.match(regex, line)
                 if match:
